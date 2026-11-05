@@ -1,6 +1,9 @@
 """Extraction, chunking, embedding, and retrieval."""
 from __future__ import annotations
 
+from apps.llm.mock import MockLLM
+from apps.llm.mock import MockLLM
+
 import logging
 import math
 import re
@@ -109,29 +112,33 @@ def split_text(
 
 
 # ---------------------------------------------------------------- embeddings
-async def aembed_in_batches(texts: list[str], *, user=None, conversation=None) -> list[list[float]]:
+async def aembed_in_batches(
+    texts: list[str],
+    *,
+    user=None,
+    conversation=None,
+) -> list[list[float]]:
     if not texts:
         return []
-    client = get_llm()
+
+    client = MockLLM()
     batch_size = max(1, settings.RAG_EMBED_BATCH_SIZE)
     vectors: list[list[float]] = []
+
     for start in range(0, len(texts), batch_size):
         batch = texts[start : start + batch_size]
         vectors.extend(await client.embed(batch))
+
         if user is not None:
             await arecord_usage(
                 user=user,
                 kind=UsageEvent.Kind.EMBEDDING,
                 conversation=conversation,
-                model=settings.LLM_EMBEDDING_MODEL,
+                model="mock-embeddings-256",
                 prompt_tokens=sum(estimate_tokens(text) for text in batch),
             )
+
     return vectors
-
-
-def embed_in_batches(texts: list[str], *, user=None, conversation=None) -> list[list[float]]:
-    return async_to_sync(aembed_in_batches)(texts, user=user, conversation=conversation)
-
 
 # ----------------------------------------------------------------- ingestion
 def ingest_document_sync(document_id) -> Document:
@@ -246,7 +253,7 @@ async def aretrieve(
     if not chunks:
         return []
 
-    vectors = await get_llm().embed([query])
+    vectors = await MockLLM().embed([query])
     if not vectors:
         return []
     query_vector = vectors[0]
