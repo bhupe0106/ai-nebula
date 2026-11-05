@@ -1,0 +1,27 @@
+{% if chat_messages %}
+  {% for message in chat_messages %}
+    {% include "chat/_message.html" with message=message user=user %}
+  {% endfor %}
+{% else %}
+  <div class="chat-empty" data-chat-empty>
+    <div class="chat-empty-orb">
+      <span class="brand-mark"><svg class="icon"><use href="#i-orbit"></use></svg></span>
+    </div>
+    <h2>Where should we start?</h2>
+    <p>Ask a question, paste some code, or attach a document to ground the answer in your own sources.</p>
+
+    {% if suggestions %}
+      <div class="suggestion-grid">
+        {% for suggestion in suggestions %}
+          <button type="button" class="suggestion-card" data-suggestion="{{ suggestion.prompt }}">
+            <span class="suggestion-icon"><svg class="icon"><use href="#i-{{ suggestion.icon }}"></use></svg></span>
+            <span>
+              <span class="suggestion-title">{{ suggestion.title }}</span>
+              <span class="suggestion-copy">{{ suggestion.prompt }}</span>
+            </span>
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}

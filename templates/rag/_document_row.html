@@ -1,0 +1,44 @@
+{% load humanize %}
+<article class="doc-row" data-document-id="{{ document.id }}"
+  {% if document.status == "pending" or document.status == "processing" %}
+    hx-get="{% url 'rag:status' document.id %}"
+    hx-trigger="load delay:2s"
+    hx-swap="outerHTML"
+  {% endif %}>
+  <span class="doc-icon"><svg class="icon"><use href="#i-doc"></use></svg></span>
+  <div class="doc-copy">
+    <span class="doc-name" title="{{ document.display_title }}">{{ document.display_title }}</span>
+    <span class="doc-meta">
+      <span class="doc-status status-{{ document.status }}">
+        <span class="status-dot"></span>{{ document.get_status_display }}
+      </span>
+      <span>·</span>
+      <span>{{ document.size_kb|intcomma }} KB</span>
+      {% if document.chunk_count %}
+        <span>·</span>
+        <span>{{ document.chunk_count }} chunk{{ document.chunk_count|pluralize }}</span>
+      {% endif %}
+      {% if document.is_global %}
+        <span>·</span>
+        <span class="global-chip">Global</span>
+      {% endif %}
+    </span>
+    {% if document.error %}
+      <span class="doc-meta" style="color:#fda4af">{{ document.error|truncatechars:70 }}</span>
+    {% endif %}
+  </div>
+  <span class="doc-actions">
+    <a href="{{ document.file.url }}" class="icon-btn" target="_blank" rel="noopener"
+       title="Open file" aria-label="Open file">
+      <svg class="icon"><use href="#i-external"></use></svg>
+    </a>
+    <button type="button" class="icon-btn icon-btn-danger"
+            hx-post="{% url 'rag:delete' document.id %}"
+            hx-target="closest .doc-row"
+            hx-swap="outerHTML swap:150ms"
+            data-confirm="Delete “{{ document.display_title }}”? This removes its embeddings too."
+            title="Delete document" aria-label="Delete document">
+      <svg class="icon"><use href="#i-trash"></use></svg>
+    </button>
+  </span>
+</article>

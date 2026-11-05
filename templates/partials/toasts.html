@@ -1,0 +1,19 @@
+{% if messages %}
+<div class="toast-stack" role="status" aria-live="polite">
+  {% for message in messages %}
+    <div class="toast toast-{{ message.tags|default:'info' }}" data-toast>
+      <span class="toast-icon">
+        {% if message.tags == 'success' %}<svg class="icon"><use href="#i-check"></use></svg>
+        {% elif message.tags == 'error' %}<svg class="icon"><use href="#i-alert"></use></svg>
+        {% else %}<svg class="icon"><use href="#i-spark"></use></svg>{% endif %}
+      </span>
+      <p>{{ message }}</p>
+      <button type="button" class="toast-close" data-toast-close aria-label="Dismiss">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div id="js-toast-stack" class="toast-stack" role="status" aria-live="polite"></div>

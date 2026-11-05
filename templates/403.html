@@ -1,0 +1,16 @@
+{% extends "base_public.html" %}
+
+{% block title %}Permission denied — Nebula{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card" style="text-align:center">
+    <div class="auth-header">
+      <span class="auth-icon"><svg class="icon"><use href="#i-lock"></use></svg></span>
+      <h1>403 — no access</h1>
+      <p>You do not have permission to view this resource. If you believe this is a mistake, contact an administrator.</p>
+    </div>
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Back home</a>
+  </div>
+</div>
+{% endblock %}

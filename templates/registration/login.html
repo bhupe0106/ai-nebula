@@ -1,0 +1,53 @@
+{% extends "base_public.html" %}
+
+{% block title %}Sign in — Nebula{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-header">
+      <span class="auth-icon"><svg class="icon"><use href="#i-lock"></use></svg></span>
+      <h1>Welcome back</h1>
+      <p>Sign in to continue your conversations and pick up every thread where you left it.</p>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="form-error">
+        <svg class="icon"><use href="#i-alert"></use></svg>
+        <div>{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+      <div class="field">
+        <label class="field-label" for="{{ form.username.id_for_label }}">Email</label>
+        {{ form.username }}
+        {% for error in form.username.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+        {% for error in form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="auth-links">
+        <span></span>
+        <a href="{% url 'password_reset' %}">Forgot your password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <svg class="icon"><use href="#i-arrow-left" style="transform:rotate(180deg)"></use></svg>
+        Sign in
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      New to Nebula? <a href="{% url 'accounts:signup' %}">Create an account</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

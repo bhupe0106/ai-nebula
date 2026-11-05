@@ -1,0 +1,169 @@
+{% extends "base_app.html" %}
+{% load humanize static %}
+
+{% block title %}{{ conversation.title }} — Nebula{% endblock %}
+{% block content_class %}chat-content{% endblock %}
+
+{% block content %}
+<div class="chat-page" data-conversation-id="{{ conversation.id }}" data-user-initials="{{ user.initials }}">
+
+  <section class="chat-main">
+    <header class="chat-header">
+      <div class="chat-head-main">
+        <span class="card-icon" style="width:2rem;height:2rem;border-radius:10px">
+          <svg class="icon"><use href="#i-chat"></use></svg>
+        </span>
+        <div class="chat-head-copy">
+          <h1 class="chat-title" data-chat-title>{{ conversation.title }}</h1>
+          <div class="chat-sub">
+            <span class="ws-status" id="ws-status" aria-live="polite">
+              <span class="ws-dot"></span>
+              <span id="ws-status-text">Connecting…</span>
+            </span>
+            <span class="dot"></span>
+            <span>{{ conversation.resolved_model }}</span>
+            <span class="dot"></span>
+            <span>{{ chat_messages|length }} message{{ chat_messages|length|pluralize }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-actions">
+        <button type="button" class="icon-btn" data-open-dialog="settings-dialog" title="Conversation settings" aria-label="Conversation settings">
+          <svg class="icon"><use href="#i-settings"></use></svg>
+        </button>
+        <a href="{% url 'chat:export' conversation.id %}" class="icon-btn action-optional" title="Export as JSON" aria-label="Export conversation">
+          <svg class="icon"><use href="#i-download"></use></svg>
+        </a>
+        <form method="post" action="{% url 'chat:archive' conversation.id %}" class="action-optional">
+          {% csrf_token %}
+          <button type="submit" class="icon-btn" title="{% if conversation.is_archived %}Restore{% else %}Archive{% endif %} conversation">
+            <svg class="icon"><use href="#i-archive"></use></svg>
+          </button>
+        </form>
+        <form method="post" action="{% url 'chat:delete' conversation.id %}" data-confirm-form="Delete this conversation and all of its messages?">
+          {% csrf_token %}
+          <button type="submit" class="icon-btn icon-btn-danger" title="Delete conversation" aria-label="Delete conversation">
+            <svg class="icon"><use href="#i-trash"></use></svg>
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <div class="chat-body" id="chat-body" data-chat-body>
+      <div class="messages" id="message-list" aria-live="polite">
+        {% include "chat/_messages.html" %}
+      </div>
+    </div>
+
+    <div class="composer-shell" id="composer">
+      <div class="composer-wrap">
+        <form class="composer" id="composer-form" method="post" action="{% url 'chat:send' conversation.id %}" data-composer-form>
+          {% csrf_token %}
+          <button type="button" class="icon-btn attach-btn" data-attach data-library-url="{% url 'rag:library' %}" title="Attach a document" aria-label="Attach a document">
+            <svg class="icon"><use href="#i-paperclip"></use></svg>
+          </button>
+          <textarea
+            name="content"
+            id="composer-input"
+            class="composer-input"
+            rows="1"
+            maxlength="8000"
+            placeholder="Ask anything…"
+            autocomplete="off"
+            data-composer-input
+            aria-label="Message"
+          ></textarea>
+          <div class="composer-actions">
+            <button type="submit" class="send-btn" data-send aria-label="Send message">
+              <svg class="icon"><use href="#i-send"></use></svg>
+            </button>
+            <button type="button" class="stop-btn" data-stop aria-label="Stop generating">
+              <svg class="icon"><use href="#i-stop"></use></svg>
+            </button>
+          </div>
+        </form>
+        <div class="composer-hint">
+          <span class="hint-left"><kbd>Enter</kbd> to send · <kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span>
+          <span class="hint-right">
+            <svg class="icon"><use href="#i-shield"></use></svg>
+            {% if quota.unlimited %}Unlimited tokens{% else %}{{ quota.remaining|intcomma }} tokens left{% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="chat-aside" aria-label="Conversation details">
+    <div class="aside-card">
+      <div class="aside-head">
+        <h2 class="aside-title"><svg class="icon"><use href="#i-doc"></use></svg> Documents</h2>
+        <span class="aside-count">{{ documents|length }}</span>
+      </div>
+      <p class="aside-copy">Attach a PDF, DOCX, Markdown or text file. Answers cite the passages that were used.</p>
+
+      <form
+        class="dropzone"
+        method="post"
+        action="{% url 'rag:upload' %}"
+        enctype="multipart/form-data"
+        hx-post="{% url 'rag:upload' %}"
+        hx-encoding="multipart/form-data"
+        hx-target="#doc-list"
+        hx-swap="afterbegin"
+        hx-on::after-request="if (event.detail.successful) { this.reset(); }"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
+        <input type="file" id="doc-file-input" name="file" class="sr-only"
+               accept=".pdf,.txt,.md,.markdown,.docx" data-auto-upload required>
+        <label for="doc-file-input" class="dropzone-hit">
+          <svg class="icon"><use href="#i-paperclip"></use></svg>
+          <span class="dropzone-title">Drop a file or browse</span>
+          <span class="dropzone-copy">PDF · DOCX · MD · TXT — up to 20 MB</span>
+        </label>
+        <input type="text" name="title" class="field-input" placeholder="Optional title" maxlength="200">
+      </form>
+      <div data-upload-feedback></div>
+
+      <div class="doc-list" id="doc-list">
+        {% for document in documents %}
+          {% include "rag/_document_row.html" with document=document conversation=conversation %}
+        {% empty %}
+          <div class="doc-empty" data-doc-empty>No documents attached yet.<br>Upload one to unlock grounded answers.</div>
+        {% endfor %}
+      </div>
+      <p class="upload-hint" style="margin-top:.6rem">Tip: documents uploaded from the library are available to every conversation.</p>
+    </div>
+
+    <div class="aside-card">
+      <div class="aside-head">
+        <h2 class="aside-title"><svg class="icon"><use href="#i-settings"></use></svg> Session</h2>
+        <button type="button" class="icon-btn" data-open-dialog="settings-dialog" aria-label="Edit session settings">
+          <svg class="icon"><use href="#i-chevron-right"></use></svg>
+        </button>
+      </div>
+      <div class="session-list">
+        <div class="session-row"><span>Model</span><span>{{ conversation.resolved_model }}</span></div>
+        <div class="session-row"><span>Temperature</span><span>{{ conversation.temperature }}</span></div>
+        <div class="session-row"><span>Retrieval</span><span>{% if conversation.use_documents %}Enabled{% else %}Off{% endif %}</span></div>
+        <div class="session-row"><span>Created</span><span>{{ conversation.created_at|date:"M j, Y" }}</span></div>
+        <div class="session-row"><span>Updated</span><span>{{ conversation.updated_at|timesince }} ago</span></div>
+      </div>
+      <form method="post" action="{% url 'chat:clear' conversation.id %}" data-confirm-form="Delete every message in this conversation? This cannot be undone." style="margin-top:.8rem">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-ghost btn-sm btn-block">
+          <svg class="icon"><use href="#i-trash"></use></svg>
+          Clear history
+        </button>
+      </form>
+    </div>
+  </aside>
+</div>
+
+{% include "chat/_settings_modal.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/chat.js' %}" defer></script>
+{% endblock %}

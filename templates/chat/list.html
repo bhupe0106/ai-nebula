@@ -1,0 +1,88 @@
+{% extends "base_app.html" %}
+{% load humanize %}
+
+{% block title %}Conversations — Nebula{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="page-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-chat"></use></svg> Workspace</p>
+    <h1 class="page-title">Your <span class="grad-text">conversations</span></h1>
+    <p class="page-sub">Every thread keeps its own context, model and system prompt. Pick up where you left off, or start something new.</p>
+  </div>
+  <div class="head-actions">
+    <a href="{% url 'rag:library' %}" class="btn btn-ghost">
+      <svg class="icon"><use href="#i-doc"></use></svg>
+      Documents
+    </a>
+    <form method="post" action="{% url 'chat:create' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">
+        <svg class="icon"><use href="#i-plus"></use></svg>
+        New conversation
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="list-stats">
+  <span class="stat-pill" style="--i:0">
+    <svg class="icon"><use href="#i-chat"></use></svg>
+    <strong>{{ conversations|length }}</strong> active
+  </span>
+  <span class="stat-pill" style="--i:1">
+    <svg class="icon"><use href="#i-archive"></use></svg>
+    <strong>{{ archived_count }}</strong> archived
+  </span>
+  <span class="stat-pill" style="--i:2">
+    <svg class="icon"><use href="#i-bolt"></use></svg>
+    <strong>{{ quota.used|intcomma }}</strong> tokens used
+  </span>
+  <span class="stat-pill" style="--i:3">
+    <svg class="icon"><use href="#i-shield"></use></svg>
+    {% if quota.unlimited %}Unlimited plan{% else %}<strong>{{ quota.remaining|intcomma }}</strong> tokens left{% endif %}
+  </span>
+</div>
+
+{% if conversations %}
+  <div class="card-grid">
+    {% for item in conversations %}
+      <article class="card card-hover conversation-card stagger" style="--i: {{ forloop.counter0 }}">
+        <div class="card-top">
+          <span class="card-icon"><svg class="icon"><use href="#i-chat"></use></svg></span>
+          <span class="meta-chip">{{ item.updated_at|timesince }} ago</span>
+        </div>
+        <div>
+          <h2 class="card-title">{{ item.title }}</h2>
+          <div class="card-meta">
+            <span class="meta-chip meta-chip-accent">{{ item.resolved_model }}</span>
+            {% if item.is_archived %}
+              <span class="meta-chip">Archived</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>{{ item.created_at|date:"M j, Y" }}</span>
+          <span class="card-arrow"><svg class="icon"><use href="#i-chevron-right"></use></svg></span>
+        </div>
+        <a class="card-stretched" href="{{ item.get_absolute_url }}" aria-label="Open {{ item.title }}"></a>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="empty-visual">
+      <span class="brand-mark"><svg class="icon"><use href="#i-orbit"></use></svg></span>
+    </div>
+    <h2 class="empty-title">No conversations yet</h2>
+    <p class="empty-copy">Start a thread and Nebula will remember the context, stream the answer, and keep a tidy token ledger.</p>
+    <form method="post" action="{% url 'chat:create' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">
+        <svg class="icon"><use href="#i-plus"></use></svg>
+        Start your first chat
+      </button>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}

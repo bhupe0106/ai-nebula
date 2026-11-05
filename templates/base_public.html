@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block layout %}
+<div class="public-shell">
+  <header class="public-nav">
+    <a href="{% url 'core:home' %}" class="brand">
+      <span class="brand-mark"><svg class="icon"><use href="#i-orbit"></use></svg></span>
+      <span class="brand-copy">
+        <span class="brand-name">Nebula</span>
+        <span class="brand-tag">AI workspace</span>
+      </span>
+    </a>
+
+    <nav class="public-links" aria-label="Primary">
+      <a href="{% url 'core:home' %}#features">Features</a>
+      <a href="{% url 'core:home' %}#how">How it works</a>
+      <a href="{% url 'core:home' %}#api">API</a>
+    </nav>
+
+    <div class="public-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'chat:list' %}" class="btn btn-primary">Open workspace</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-ghost">Sign in</a>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Get started</a>
+      {% endif %}
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="public-footer">
+    <div class="footer-inner">
+      <div class="flex items-center gap-2 text-slate-400">
+        <span class="brand-mark brand-mark-sm"><svg class="icon"><use href="#i-orbit"></use></svg></span>
+        <span>Nebula — built with Django, Channels &amp; HTMX</span>
+      </div>
+      <div class="footer-links">
+        <a href="{% url 'core:health' %}">Status</a>
+        <a href="{% url 'api:conversation-list' %}">API</a>
+        <a href="{% url 'accounts:signup' %}">Create account</a>
+      </div>
+    </div>
+  </footer>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block layout %}
+<div class="app-shell">
+  {% include "partials/sidebar.html" %}
+  <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+  <div class="app-main">
+    <div class="mobile-bar lg:hidden">
+      <button type="button" class="icon-btn" data-sidebar-toggle aria-label="Open navigation">
+        <svg class="icon"><use href="#i-menu"></use></svg>
+      </button>
+      <a href="{% url 'chat:list' %}" class="mobile-brand">
+        <span class="brand-mark brand-mark-sm"><svg class="icon"><use href="#i-orbit"></use></svg></span>
+        <span>Nebula</span>
+      </a>
+      <a href="{% url 'accounts:profile' %}" class="avatar avatar-sm" aria-label="Your profile">
+        {% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ user.initials }}{% endif %}
+      </a>
+    </div>
+
+    <main class="app-content {% block content_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}

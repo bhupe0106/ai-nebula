@@ -1,0 +1,199 @@
+{% extends "base_public.html" %}
+
+{% block title %}Nebula — your AI workspace, self-hosted{% endblock %}
+{% block description %}A production-ready Django AI chat workspace with WebSocket streaming, document grounding, usage quotas and a REST API.{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span class="badge"><span class="badge-dot"></span> Django · Channels · HTMX</span>
+    <h1 class="hero-title">An AI workspace<br>that feels <span class="grad-text">alive</span>.</h1>
+    <p class="hero-text">
+      Nebula streams answers token by token, grounds them in your own documents, and keeps a
+      transparent ledger of every token spent. Bring OpenAI, Groq, OpenRouter, Ollama or any
+      OpenAI-compatible provider — the interface stays the same.
+    </p>
+    <div class="hero-actions">
+      <a href="{% url 'accounts:signup' %}" class="btn btn-primary">
+        <svg class="icon"><use href="#i-spark"></use></svg>
+        Start free
+      </a>
+      <a href="{% url 'login' %}" class="btn btn-ghost">
+        <svg class="icon"><use href="#i-arrow-left"></use></svg>
+        Sign in
+      </a>
+    </div>
+    <div class="hero-metrics">
+      <div class="metric"><strong>SSE + WS</strong><span>Streaming by default</span></div>
+      <div class="metric"><strong>5 formats</strong><span>PDF, DOCX, MD, TXT</span></div>
+      <div class="metric"><strong>REST + JWT</strong><span>Automation ready</span></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="preview-window">
+      <div class="preview-top">
+        <div class="preview-dots"><span></span><span></span><span></span></div>
+        <span class="preview-title">nebula / conversations / product-brief</span>
+        <span class="preview-live">streaming</span>
+      </div>
+      <div class="preview-body">
+        <div class="mock-msg mock-user">
+          <span class="mock-avatar">You</span>
+          <div class="mock-bubble">Summarize the attached product brief and list the top three risks.</div>
+        </div>
+        <div class="mock-msg mock-assistant">
+          <span class="mock-avatar"><svg class="icon"><use href="#i-spark"></use></svg></span>
+          <div class="mock-bubble">
+            <strong>Summary.</strong> The brief proposes a usage-based tier with document grounding
+            as the flagship feature.<br><br>
+            <strong>Risks.</strong><br>
+            1. Embedding cost scales with uploads.<br>
+            2. Quota messaging must be clear at the limit.<br>
+            3. Provider latency varies by region.<span class="mock-caret"></span>
+          </div>
+        </div>
+        <div class="mock-msg mock-user" style="animation-delay:.2s">
+          <span class="mock-avatar">You</span>
+          <div class="mock-bubble">Cite the passages you used.</div>
+        </div>
+        <div class="mock-msg mock-assistant" style="animation-delay:.35s">
+          <span class="mock-avatar"><svg class="icon"><use href="#i-spark"></use></svg></span>
+          <div class="mock-bubble" style="display:flex;gap:.3rem;flex-wrap:wrap">
+            <span class="citation-chip"><svg class="icon"><use href="#i-doc"></use></svg> brief.pdf · p.4</span>
+            <span class="citation-chip"><svg class="icon"><use href="#i-doc"></use></svg> pricing.md</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="floating-chip chip-one"><svg class="icon"><use href="#i-bolt"></use></svg> 1.2s first token</span>
+    <span class="floating-chip chip-two"><svg class="icon"><use href="#i-shield"></use></svg> quota enforced</span>
+    <span class="floating-chip chip-three"><svg class="icon"><use href="#i-database"></use></svg> RAG grounded</span>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-head">
+    <span class="section-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-layers"></use></svg> Everything included</span>
+    <h2 class="section-title">Production concerns, already handled</h2>
+    <p class="section-copy">No glue code, no half-finished admin. Auth, streaming, retrieval, quotas, API and tests ship in the box.</p>
+  </div>
+
+  <div class="feature-grid">
+    <article class="card card-hover feature-card stagger" style="--i:0">
+      <span class="feature-icon"><svg class="icon"><use href="#i-bolt"></use></svg></span>
+      <h3>Token streaming</h3>
+      <p>WebSocket deltas render with a live caret, then swap to sanitized Markdown when the reply completes.</p>
+    </article>
+    <article class="card card-hover feature-card stagger" style="--i:1">
+      <span class="feature-icon"><svg class="icon"><use href="#i-doc"></use></svg></span>
+      <h3>Document grounding</h3>
+      <p>PDF, DOCX, Markdown and text files are chunked, embedded and retrieved per conversation or globally.</p>
+    </article>
+    <article class="card card-hover feature-card stagger" style="--i:2">
+      <span class="feature-icon"><svg class="icon"><use href="#i-globe"></use></svg></span>
+      <h3>Provider agnostic</h3>
+      <p>One OpenAI-compatible adapter covers OpenAI, Azure, Groq, OpenRouter, Together, Ollama and LM Studio.</p>
+    </article>
+    <article class="card card-hover feature-card stagger" style="--i:3">
+      <span class="feature-icon"><svg class="icon"><use href="#i-chart"></use></svg></span>
+      <h3>Usage quotas</h3>
+      <p>Every completion and embedding is metered. Monthly allowances reset automatically and block at the limit.</p>
+    </article>
+    <article class="card card-hover feature-card stagger" style="--i:4">
+      <span class="feature-icon"><svg class="icon"><use href="#i-code"></use></svg></span>
+      <h3>REST API + JWT</h3>
+      <p>Conversations, messages and documents are scriptable with per-user throttling and pagination.</p>
+    </article>
+    <article class="card card-hover feature-card stagger" style="--i:5">
+      <span class="feature-icon"><svg class="icon"><use href="#i-shield"></use></svg></span>
+      <h3>Secure by default</h3>
+      <p>Custom email-first users, CSRF-protected forms, sanitized Markdown and owner-only querysets.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="section-head">
+    <span class="section-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-command"></use></svg> How it works</span>
+    <h2 class="section-title">From clone to conversation in three steps</h2>
+  </div>
+  <div class="how-grid">
+    <article class="card step-card">
+      <span class="step-number">01</span>
+      <h3>Configure a provider</h3>
+      <p>Copy <code class="prose-chat" style="font-family:monospace">.env.example</code>, point <code style="font-family:monospace">LLM_BASE_URL</code> at your provider and add a key. Or keep the mock provider for an offline demo.</p>
+    </article>
+    <article class="card step-card">
+      <span class="step-number">02</span>
+      <h3>Create your account</h3>
+      <p>Sign up, start a thread, and tune the model, temperature and system prompt per conversation.</p>
+    </article>
+    <article class="card step-card">
+      <span class="step-number">03</span>
+      <h3>Add your knowledge</h3>
+      <p>Upload documents from the chat panel or the library, then ask questions and get cited answers.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="api">
+  <div class="library-grid">
+    <div>
+      <div class="section-head" style="margin-bottom:1.2rem">
+        <span class="section-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-code"></use></svg> Automate anything</span>
+        <h2 class="section-title">A REST API that matches the UI</h2>
+        <p class="section-copy">Exchange credentials for a JWT, then drive conversations, messages and uploads from scripts, CI or your own frontend.</p>
+      </div>
+      <div class="list-stats">
+        <span class="stat-pill"><svg class="icon"><use href="#i-lock"></use></svg> JWT auth</span>
+        <span class="stat-pill"><svg class="icon"><use href="#i-refresh"></use></svg> Throttled</span>
+        <span class="stat-pill"><svg class="icon"><use href="#i-layers"></use></svg> Paginated</span>
+      </div>
+      <a href="{% url 'api:conversation-list' %}" class="btn btn-ghost" target="_blank" rel="noopener">
+        <svg class="icon"><use href="#i-external"></use></svg>
+        Browse the API
+      </a>
+    </div>
+
+    <div class="code-card">
+      <div class="code-head">
+        <svg class="icon" style="width:.85rem;height:.85rem"><use href="#i-code"></use></svg>
+        shell
+      </div>
+<pre class="code-body"><span class="tok-com"># 1. Get an access token</span>
+curl -s http://localhost:8000/api/v1/auth/token/ \
+  -H <span class="tok-str">"Content-Type: application/json"</span> \
+  -d <span class="tok-str">'&#123;"email":"you@example.com","password":"…"&#125;'</span>
+
+<span class="tok-com"># 2. Create a conversation</span>
+curl -s http://localhost:8000/api/v1/conversations/ \
+  -H <span class="tok-str">"Authorization: Bearer $ACCESS_TOKEN"</span> \
+  -H <span class="tok-str">"Content-Type: application/json"</span> \
+  -d <span class="tok-str">'&#123;"title":"From the API"&#125;'</span>
+
+<span class="tok-com"># 3. Send a message</span>
+curl -s http://localhost:8000/api/v1/conversations/&lt;id&gt;/messages/ \
+  -H <span class="tok-str">"Authorization: Bearer $ACCESS_TOKEN"</span> \
+  -H <span class="tok-str">"Content-Type: application/json"</span> \
+  -d <span class="tok-str">'&#123;"content":"Summarize the docs"&#125;'</span></pre>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="cta-inner">
+    <div>
+      <h2>Ready to give your team a real AI workspace?</h2>
+      <p>Self-hosted, provider-agnostic, and polished out of the box.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="{% url 'accounts:signup' %}" class="btn btn-primary">
+        <svg class="icon"><use href="#i-spark"></use></svg>
+        Create your workspace
+      </a>
+      <a href="{% url 'login' %}" class="btn btn-ghost">Sign in</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

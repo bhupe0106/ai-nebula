@@ -1,0 +1,32 @@
+# Core
+Django>=6.0,<6.2
+django-environ>=0.12
+daphne>=4.2
+channels>=4.3
+channels-redis>=4.3
+
+# API
+djangorestframework>=3.16
+djangorestframework-simplejwt>=5.5
+
+# HTTP client for OpenAI-compatible providers
+httpx>=0.28
+
+# Database / cache (Postgres in Docker, Redis for channels + Celery)
+psycopg[binary]>=3.2
+redis>=6.0
+
+# Background tasks
+celery[redis]>=5.5
+
+# Static files
+whitenoise>=6.9
+
+# RAG document ingestion
+pypdf>=6.0
+python-docx>=1.2
+Pillow>=11.0
+
+# Markdown rendering
+Markdown>=3.8
+bleach>=6.2

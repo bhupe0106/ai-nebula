@@ -1,0 +1,19 @@
+{% extends "base_public.html" %}
+
+{% block title %}Page not found — Nebula{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card" style="text-align:center">
+    <div class="auth-header">
+      <span class="auth-icon"><svg class="icon"><use href="#i-search"></use></svg></span>
+      <h1>404 — off the map</h1>
+      <p>The page you are looking for drifted out of orbit. Check the address, or head back to your workspace.</p>
+    </div>
+    <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap">
+      <a href="{% url 'core:home' %}" class="btn btn-primary">Back home</a>
+      {% if user.is_authenticated %}<a href="{% url 'chat:list' %}" class="btn btn-ghost">Open workspace</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

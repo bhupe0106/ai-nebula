@@ -1,0 +1,132 @@
+{% extends "base_app.html" %}
+{% load humanize %}
+
+{% block title %}Profile — Nebula{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="page-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-user"></use></svg> Account</p>
+    <h1 class="page-title">Your <span class="grad-text">profile</span></h1>
+    <p class="page-sub">Update how you appear across the workspace. Your email is used to sign in and is never shown to other accounts.</p>
+  </div>
+  <div class="head-actions">
+    <a href="{% url 'usage:dashboard' %}" class="btn btn-ghost">
+      <svg class="icon"><use href="#i-chart"></use></svg>
+      Usage
+    </a>
+  </div>
+</div>
+
+<div class="library-grid">
+  <section class="card panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title"><svg class="icon"><use href="#i-user"></use></svg> Details</h2>
+        <p class="panel-sub">Changes apply immediately.</p>
+      </div>
+      <span class="avatar">
+        {% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ user.initials }}{% endif %}
+      </span>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="form-error">
+        <svg class="icon"><use href="#i-alert"></use></svg>
+        <div>{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <div class="field">
+        <label class="field-label" for="{{ form.display_name.id_for_label }}">
+          Display name
+          <span class="field-hint">Shown in the sidebar and message headers.</span>
+        </label>
+        {{ form.display_name }}
+        {% for error in form.display_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="profile-email">Email</label>
+        <input type="email" id="profile-email" class="field-input" value="{{ user.email }}" disabled>
+        <p class="field-help">Contact an administrator to change your sign-in email.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="{{ form.bio.id_for_label }}">
+          Bio
+          <span class="field-hint">Optional context for your account.</span>
+        </label>
+        {{ form.bio }}
+        {% for error in form.bio.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="{{ form.avatar.id_for_label }}">
+          Avatar
+          <span class="field-hint">PNG or JPEG, square works best.</span>
+        </label>
+        {{ form.avatar }}
+        {% for error in form.avatar.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <svg class="icon"><use href="#i-check"></use></svg>
+        Save changes
+      </button>
+    </form>
+  </section>
+
+  <div style="display:flex;flex-direction:column;gap:1rem">
+    <section class="card usage-card">
+      <span class="usage-label"><svg class="icon"><use href="#i-bolt"></use></svg> Monthly allowance</span>
+      <p class="usage-value">
+        {% if quota.unlimited %}Unlimited{% else %}{{ quota.used|intcomma }}<span class="unit">/ {{ quota.quota|intcomma }} tokens</span>{% endif %}
+      </p>
+      <div class="quota-track" style="height:7px;margin-top:.7rem">
+        <div class="quota-fill" style="width:{% if quota.unlimited %}100{% else %}{{ quota.percent }}{% endif %}%"></div>
+      </div>
+      <p class="usage-note" style="margin-top:.55rem">
+        {% if quota.unlimited %}No limit is enforced on this account.
+        {% elif quota.exceeded %}Limit reached — resets {{ quota.resets_on|date:"M j, Y" }}.
+        {% else %}{{ quota.remaining|intcomma }} tokens remaining · resets {{ quota.resets_on|date:"M j, Y" }}.{% endif %}
+      </p>
+    </section>
+
+    <section class="card panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><svg class="icon"><use href="#i-layers"></use></svg> Workspace</h2>
+          <p class="panel-sub">Your footprint at a glance.</p>
+        </div>
+      </div>
+      <div class="session-list">
+        <div class="session-row"><span>Conversations</span><span>{{ user.conversations.count }}</span></div>
+        <div class="session-row"><span>Documents</span><span>{{ user.documents.count }}</span></div>
+        <div class="session-row"><span>Usage events</span><span>{{ user.usage_events.count }}</span></div>
+        <div class="session-row"><span>Member since</span><span>{{ user.date_joined|date:"M j, Y" }}</span></div>
+        <div class="session-row"><span>Last login</span><span>{{ user.last_login|date:"M j, H:i"|default:"—" }}</span></div>
+      </div>
+    </section>
+
+    <section class="card panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><svg class="icon"><use href="#i-logout"></use></svg> Session</h2>
+          <p class="panel-sub">Sign out of this device.</p>
+        </div>
+      </div>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-ghost btn-block">
+          <svg class="icon"><use href="#i-logout"></use></svg>
+          Sign out
+        </button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

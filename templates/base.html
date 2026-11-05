@@ -1,0 +1,66 @@
+{% load static %}<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Nebula — AI workspace{% endblock %}</title>
+  <meta name="description" content="{% block description %}A production-ready Django AI chat workspace with streaming, documents, usage quotas and a REST API.{% endblock %}">
+  <meta name="theme-color" content="#07080c">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='7' fill='url(%23g)'/%3E%3Ccircle cx='12' cy='12' r='3' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 950: '#07080c', 900: '#0b0d13', 850: '#0f121a', 800: '#141824', 700: '#1c2230' },
+            accent: { DEFAULT: '#8b5cf6', soft: '#a78bfa', cyan: '#22d3ee', lime: '#a3e635' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            display: ['Sora', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% include "partials/icons.html" %}
+
+  <div class="app-bg" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+    <span class="bg-noise"></span>
+  </div>
+
+  {% block layout %}{% endblock %}
+
+  {% include "partials/toasts.html" %}
+
+  <dialog id="confirm-dialog" class="modal" aria-labelledby="confirm-title">
+    <div class="modal-card confirm-card">
+      <div class="confirm-icon"><svg class="icon"><use href="#i-alert"></use></svg></div>
+      <h3 id="confirm-title" class="confirm-title">Are you sure?</h3>
+      <p id="confirm-message" class="confirm-message">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-ghost" data-confirm-cancel>Cancel</button>
+        <button type="button" class="btn btn-danger" data-confirm-ok>Delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="{% static 'js/app.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends "base_public.html" %}
+
+{% block title %}Signed out — Nebula{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card" style="text-align:center">
+    <div class="auth-header">
+      <span class="auth-icon"><svg class="icon"><use href="#i-logout"></use></svg></span>
+      <h1>You are signed out</h1>
+      <p>Your conversations are safe. Sign back in whenever you are ready.</p>
+    </div>
+    <a href="{% url 'login' %}" class="btn btn-primary btn-block">Sign in again</a>
+    <p class="auth-footer"><a href="{% url 'core:home' %}">Back to the homepage</a></p>
+  </div>
+</div>
+{% endblock %}

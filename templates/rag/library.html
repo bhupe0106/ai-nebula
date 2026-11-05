@@ -1,0 +1,93 @@
+{% extends "base_app.html" %}
+{% load humanize %}
+
+{% block title %}Documents — Nebula{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="page-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-doc"></use></svg> Knowledge</p>
+    <h1 class="page-title">Document <span class="grad-text">library</span></h1>
+    <p class="page-sub">Upload source material once, then every conversation can retrieve and cite it. Files are chunked, embedded, and stored per account.</p>
+  </div>
+  <div class="head-actions">
+    <a href="{% url 'chat:list' %}" class="btn btn-ghost">
+      <svg class="icon"><use href="#i-chat"></use></svg>
+      Conversations
+    </a>
+  </div>
+</div>
+
+<div class="list-stats">
+  <span class="stat-pill"><svg class="icon"><use href="#i-database"></use></svg><strong>{{ documents|length }}</strong> documents</span>
+  <span class="stat-pill"><svg class="icon"><use href="#i-globe"></use></svg><strong>{{ global_count }}</strong> global</span>
+  <span class="stat-pill"><svg class="icon"><use href="#i-chat"></use></svg><strong>{{ chat_count }}</strong> chat-scoped</span>
+</div>
+
+<div class="library-grid">
+  <section class="card panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title"><svg class="icon"><use href="#i-layers"></use></svg> Your documents</h2>
+        <p class="panel-sub">Global documents are available in every conversation.</p>
+      </div>
+      <span class="meta-chip">{{ documents|length }} total</span>
+    </div>
+
+    <div class="doc-list doc-table" id="doc-list">
+      {% for document in documents %}
+        {% include "rag/_document_row.html" with document=document conversation=document.conversation %}
+      {% empty %}
+        <div class="library-empty" data-doc-empty>
+          <span class="brand-mark brand-mark-sm"><svg class="icon"><use href="#i-doc"></use></svg></span>
+          <p>Nothing here yet. Upload your first document to get started.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="card panel upload-panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title"><svg class="icon"><use href="#i-paperclip"></use></svg> Upload</h2>
+        <p class="panel-sub">PDF, DOCX, Markdown or plain text.</p>
+      </div>
+    </div>
+
+    <form
+      method="post"
+      action="{% url 'rag:upload' %}"
+      enctype="multipart/form-data"
+      hx-post="{% url 'rag:upload' %}"
+      hx-encoding="multipart/form-data"
+      hx-target="#doc-list"
+      hx-swap="afterbegin"
+      hx-on::after-request="if (event.detail.successful) { this.reset(); }"
+    >
+      {% csrf_token %}
+      <label class="dropzone" for="library-file">
+        <input type="file" id="library-file" name="file" class="sr-only"
+               accept=".pdf,.txt,.md,.markdown,.docx" data-auto-upload required>
+        <svg class="icon"><use href="#i-doc"></use></svg>
+        <span class="dropzone-title">Drop a file or browse</span>
+        <span class="dropzone-copy">Maximum 20 MB. Text is extracted, chunked and embedded.</span>
+      </label>
+      <div class="field">
+        <label class="field-label" for="library-title">Title <span class="field-hint">Optional</span></label>
+        <input type="text" id="library-title" name="title" class="field-input" maxlength="200"
+               placeholder="e.g. Q3 product brief">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">
+        <svg class="icon"><use href="#i-plus"></use></svg>
+        Upload &amp; index
+      </button>
+    </form>
+    <div data-upload-feedback></div>
+
+    <p class="upload-hint" style="margin-top:.9rem">
+      Ingestion runs in the background. Status updates appear automatically — ready documents are
+      immediately available for retrieval in chat.
+    </p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% firstof active_id conversation.id "" as current_id_raw %}
+{% with current_id=current_id_raw|stringformat:"s" %}
+  {% for item in sidebar_conversations %}
+    <a href="{{ item.get_absolute_url }}"
+       class="conversation-item {% if item.id|stringformat:'s' == current_id %}is-active{% endif %}"
+       title="{{ item.title }}">
+      <span class="conversation-icon"><svg class="icon"><use href="#i-chat"></use></svg></span>
+      <span class="conversation-copy">
+        <span class="conversation-title">{{ item.title }}</span>
+        <span class="conversation-time">{{ item.updated_at|timesince }} ago</span>
+      </span>
+    </a>
+  {% empty %}
+    <div class="sidebar-empty">
+      <span class="sidebar-empty-icon"><svg class="icon"><use href="#i-spark"></use></svg></span>
+      <p>No conversations yet.</p>
+      <span>Start one above.</span>
+    </div>
+  {% endfor %}
+{% endwith %}

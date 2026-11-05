@@ -1,0 +1,66 @@
+{% load ui humanize %}
+<article class="message message-{{ message.role }}"
+         data-message-id="{{ message.id }}"
+         style="--i: {{ forloop.counter0|default:0 }}">
+  <div class="message-avatar" aria-hidden="true">
+    {% if message.role == "user" %}
+      {{ user.initials|default:"You" }}
+    {% else %}
+      <svg class="icon"><use href="#i-spark"></use></svg>
+    {% endif %}
+  </div>
+
+  <div class="message-body">
+    <div class="message-head">
+      <span class="message-author">
+        {% if message.role == "user" %}You{% else %}Nebula{% endif %}
+      </span>
+      <span class="message-time">{{ message.created_at|date:"H:i" }}</span>
+      {% if message.role == "assistant" and message.model %}
+        <span class="meta-chip meta-chip-accent">{{ message.model }}</span>
+      {% endif %}
+      {% if message.total_tokens %}
+        <span class="token-pill">{{ message.total_tokens|intcomma }} tok</span>
+      {% endif %}
+      <span class="message-tools">
+        <button type="button" class="copy-btn"
+                data-copy-selector="#msg-body-{{ message.id }}"
+                aria-label="Copy message" title="Copy">
+          <svg class="icon"><use href="#i-copy"></use></svg>
+        </button>
+      </span>
+    </div>
+
+    <div class="prose-chat" id="msg-body-{{ message.id }}">
+      {% if message.role == "user" %}
+        {{ message.content|linebreaksbr }}
+      {% else %}
+        {{ message.content|markdownify }}
+      {% endif %}
+    </div>
+
+    {% if message.error %}
+      <div class="message-error-note">
+        <svg class="icon"><use href="#i-alert"></use></svg>
+        <span>{{ message.error }}</span>
+      </div>
+    {% endif %}
+
+    {% if message.citations %}
+      <details class="citations">
+        <summary>
+          <svg class="icon"><use href="#i-chevron-right"></use></svg>
+          {{ message.citations|length }} source{{ message.citations|length|pluralize }}
+        </summary>
+        <div class="citation-list">
+          {% for citation in message.citations %}
+            <span class="citation-chip" title="Relevance {{ citation.score }}">
+              <svg class="icon"><use href="#i-doc"></use></svg>
+              {{ citation.title }}
+            </span>
+          {% endfor %}
+        </div>
+      </details>
+    {% endif %}
+  </div>
+</article>

@@ -1,0 +1,113 @@
+{% extends "base_app.html" %}
+{% load humanize ui %}
+
+{% block title %}Usage — Nebula{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="page-eyebrow"><svg class="icon" style="width:.8rem;height:.8rem"><use href="#i-chart"></use></svg> Account</p>
+    <h1 class="page-title">Usage &amp; <span class="grad-text">quotas</span></h1>
+    <p class="page-sub">A transparent ledger of every token spent on chat completions and embeddings, aggregated by day.</p>
+  </div>
+  <div class="head-actions">
+    <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">
+      <svg class="icon"><use href="#i-user"></use></svg>
+      Profile
+    </a>
+  </div>
+</div>
+
+<div class="usage-grid">
+  <div class="card usage-card">
+    <span class="usage-label"><svg class="icon"><use href="#i-bolt"></use></svg> Used this month</span>
+    <p class="usage-value">{{ quota.used|intcomma }}<span class="unit">tokens</span></p>
+    <p class="usage-note">
+      {% if quota.unlimited %}Unlimited account{% else %}of {{ quota.quota|intcomma }} included{% endif %}
+    </p>
+  </div>
+  <div class="card usage-card">
+    <span class="usage-label"><svg class="icon"><use href="#i-shield"></use></svg> Remaining</span>
+    <p class="usage-value">
+      {% if quota.unlimited %}∞{% else %}{{ quota.remaining|intcomma }}{% endif %}<span class="unit">tokens</span>
+    </p>
+    <p class="usage-note">Resets {{ quota.resets_on|date:"M j, Y" }}</p>
+  </div>
+  <div class="card usage-card">
+    <span class="usage-label"><svg class="icon"><use href="#i-clock"></use></svg> Plan status</span>
+    <p class="usage-value">{% if quota.exceeded %}Limit reached{% elif quota.unlimited %}Unlimited{% else %}Healthy{% endif %}</p>
+    <p class="usage-note">{% if quota.exceeded %}Top up or wait for the monthly reset.{% else %}You have room to keep exploring.{% endif %}</p>
+  </div>
+</div>
+
+<section class="card chart-card">
+  <div class="panel-head">
+    <div>
+      <h2 class="panel-title"><svg class="icon"><use href="#i-chart"></use></svg> Last 30 days</h2>
+      <p class="panel-sub">Prompt and completion tokens combined.</p>
+    </div>
+    <span class="meta-chip meta-chip-accent">Peak {{ peak|intcomma }} / day</span>
+  </div>
+
+  <div class="quota-track" style="height:7px;margin-bottom:1rem">
+    <div class="quota-fill" style="width:{% if quota.unlimited %}8{% else %}{{ quota.percent }}{% endif %}%"></div>
+  </div>
+
+  <div class="chart" role="img" aria-label="Daily token usage for the last 30 days">
+    {% for point in chart %}
+      <div class="chart-bar-wrap">
+        <span class="chart-tip">{{ point.day|date:"M j" }} · {{ point.tokens|intcomma }}</span>
+        <div class="chart-bar" style="height: {{ point.tokens|percentage:peak }}%"></div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="chart-labels">
+    <span>{{ chart.0.day|date:"M j" }}</span>
+    <span>{% for point in chart %}{% if forloop.last %}{{ point.day|date:"M j" }}{% endif %}{% endfor %}</span>
+  </div>
+</section>
+
+<section class="card panel">
+  <div class="panel-head">
+    <div>
+      <h2 class="panel-title"><svg class="icon"><use href="#i-clock"></use></svg> Recent activity</h2>
+      <p class="panel-sub">The 25 most recent billable operations.</p>
+    </div>
+  </div>
+  {% if recent %}
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Type</th>
+            <th>Conversation</th>
+            <th>Model</th>
+            <th style="text-align:right">Tokens</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in recent %}
+            <tr>
+              <td>{{ event.created_at|date:"M j, H:i" }}</td>
+              <td>{{ event.get_kind_display }}</td>
+              <td class="cell-strong">
+                {% if event.conversation %}
+                  <a href="{{ event.conversation.get_absolute_url }}">{{ event.conversation.title|truncatechars:34 }}</a>
+                {% else %}—{% endif %}
+              </td>
+              <td>{{ event.model|default:"—" }}</td>
+              <td style="text-align:right" class="cell-strong">{{ event.total_tokens|intcomma }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="library-empty">
+      <span class="brand-mark brand-mark-sm"><svg class="icon"><use href="#i-chart"></use></svg></span>
+      <p>No usage recorded yet. Start a conversation to see the ledger fill up.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

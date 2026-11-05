@@ -1,0 +1,16 @@
+{% extends "base_public.html" %}
+
+{% block title %}Something went wrong — Nebula{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card" style="text-align:center">
+    <div class="auth-header">
+      <span class="auth-icon"><svg class="icon"><use href="#i-alert"></use></svg></span>
+      <h1>500 — unexpected error</h1>
+      <p>Something broke on our side. The error has been logged. Please try again in a moment.</p>
+    </div>
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Back home</a>
+  </div>
+</div>
+{% endblock %}
